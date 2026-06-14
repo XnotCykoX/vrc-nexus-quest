@@ -1,0 +1,11 @@
+{
+  "appId": "com.deize.vrcnexus.quest",
+  "appName": "VRC-NEXUS",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}
