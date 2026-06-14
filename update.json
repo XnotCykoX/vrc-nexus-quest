@@ -1,6 +1,6 @@
 {
   "version": "0.1.5",
   "versionCode": 6,
-  "apkUrl": "https://github.com/XnotCykoX/vrc-nexus-quest/releases/download/v0.1.5/VRC-NEXUS-Quest.apk",
+  "apkUrl": "https://raw.githubusercontent.com/XnotCykoX/vrc-nexus-quest/main/VRC-NEXUS-Quest.apk",
   "notes": "OSC helpers: live sliders to set numeric params (height/hue/scale), quick actions (mute/jump/typing), Input script block"
 }
