@@ -31,6 +31,16 @@ const TABS = [
   ["account", "👤", "Account"],
 ];
 
+// ---------- UI scale (Quest is viewed at arm's length) ----------
+const uiScale = ref(Math.min(2.2, Math.max(0.8, Number(localStorage.getItem("ui_scale")) || 1.4)));
+function applyScale() { document.documentElement.style.setProperty("--ui-scale", String(uiScale.value)); }
+function setScale(d) {
+  uiScale.value = Math.min(2.2, Math.max(0.8, Math.round((uiScale.value + d) * 10) / 10));
+  try { localStorage.setItem("ui_scale", String(uiScale.value)); } catch { /* ignore */ }
+  applyScale();
+}
+applyScale();
+
 const toast = ref("");
 let toastT = null;
 function notify(m) { toast.value = m; clearTimeout(toastT); toastT = setTimeout(() => (toast.value = ""), 2600); }
@@ -246,6 +256,11 @@ onMounted(async () => {
     <header class="topbar">
       <div class="brand"><span class="logo">✦</span> VRC-<b>NEXUS</b> <small>Quest</small></div>
       <div class="sp"></div>
+      <div class="scale-ctl" title="UI size">
+        <button @click="setScale(-0.1)">A−</button>
+        <span>{{ Math.round(uiScale * 100) }}%</span>
+        <button @click="setScale(0.1)">A+</button>
+      </div>
       <div class="me" v-if="store.user">{{ store.user.displayName }}</div>
       <div class="me muted" v-else>Not signed in</div>
     </header>
