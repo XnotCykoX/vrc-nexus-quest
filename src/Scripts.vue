@@ -1,7 +1,7 @@
 <script setup>
 // Visual OSC scripting — stack blocks, set loops, ramp values (e.g. rainbow Hue), run over OSC.
 // No drag-and-drop (awkward on Quest): tap to add, reorder with ↑/↓, edit inline.
-import { reactive, ref, computed } from "vue";
+import { reactive, ref, computed, onMounted } from "vue";
 import * as osc from "./osc.js";
 
 let uid = 1;
@@ -110,6 +110,7 @@ function load(name) {
 }
 function del(name) { delete saved[name]; persist(); }
 
+onMounted(() => { try { if (new URLSearchParams(location.search).get("demo") === "rainbow") loadRainbow(); } catch { /* ignore */ } });
 function loadRainbow() {
   program.splice(0, program.length);
   const loop = makeBlock("loop"); loop.count = 0;

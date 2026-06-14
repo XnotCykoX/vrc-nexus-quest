@@ -68,4 +68,5 @@ for (const [d, n] of Object.entries(LG)) { const buf = png(n, n, render(n, n, { 
 // STORE: SOLID (no alpha channel) square icon + 10:3 hero 3000x900
 for (const N of [512, 1024]) writeFileSync(`VRC-NEXUS-icon-${N}.png`, png(N, N, render(N, N, { rounded: false }), false));
 writeFileSync(`VRC-NEXUS-hero-3000x900.png`, png(3000, 900, render(3000, 900, { rounded: false, S: 2 }), false));
-console.log("wrote: SOLID (RGB, no transparency) icons 512/1024 + hero 3000x900 + launcher icons");
+writeFileSync(`VRC-NEXUS-cover-2560x1440.png`, png(2560, 1440, render(2560, 1440, { rounded: false, S: 2 }), false));
+console.log("wrote: SOLID (RGB) icons 512/1024 + hero 3000x900 + cover 2560x1440 + launcher icons");

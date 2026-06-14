@@ -262,6 +262,15 @@ function openTab(name) {
 }
 
 onMounted(async () => {
+  // Deep-link support (also used for store screenshots): ?tab=, ?q= (discover), ?osc=1 (show OSC UI off-device)
+  const params = new URLSearchParams(location.search);
+  if (params.get("osc") === "1") oscState.available = true;
+  const initTab = params.get("tab");
+  if (initTab && TABS.some((t) => t[0] === initTab)) {
+    openTab(initTab);
+    const q = params.get("q");
+    if (q && initTab === "discover") { disc.q = q; runDiscover(); }
+  }
   if (osc.oscAvailable()) startOsc();     // collect avatar params in the background (for set_hue/set_emission)
   await vrc.loadSession();               // restore the durable login cookie (survives updates)
   if (vrc.isLoggedIn()) { try { store.user = await vrc.currentUser(); } catch { /* ignore */ } }
