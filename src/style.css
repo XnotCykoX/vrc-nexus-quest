@@ -91,6 +91,7 @@ button.primary:active,button.ghost:active{transform:scale(.97)}
 .paramlist{display:flex;flex-direction:column;gap:6px;margin-top:6px;max-height:280px;overflow:auto}
 .prow{display:flex;justify-content:space-between;gap:12px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 13px;font-size:14px}
 .prow b{color:var(--accent)}
+.pright{display:flex;align-items:center;gap:8px;flex:0 0 auto}
 .osc-status{margin:10px 0 0;font-size:13px;font-weight:600;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px 13px;word-break:break-word}
 
 /* ---- gallery ---- */

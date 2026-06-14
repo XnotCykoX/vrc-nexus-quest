@@ -165,7 +165,27 @@ async function hideNotif(n) { if (await vrc.hideNotification(n.id)) { nt.list = 
 
 // ---------- OSC ----------
 const _t = osc.getTarget();
-const oscState = reactive({ available: osc.oscAvailable(), chat: "", pName: "", pVal: "", receiving: false, incoming: [], host: _t.host, port: _t.port, last: "" });
+const oscState = reactive({ available: osc.oscAvailable(), chat: "", pName: "", pVal: "", receiving: false, params: {}, host: _t.host, port: _t.port, last: "" });
+const paramList = computed(() => Object.entries(oscState.params).map(([name, value]) => ({ name, value })).sort((a, b) => a.name.localeCompare(b.name)));
+function fmtVal(v) { return typeof v === "number" ? (Number.isInteger(v) ? v : v.toFixed(3)) : String(v); }
+// Auto-collect every avatar parameter VRChat streams (built-ins arrive instantly; all of them on avatar load).
+async function startOsc() {
+  if (oscState.receiving || !oscState.available) return;
+  try {
+    await osc.startReceiver((address, args) => {
+      if (address === "/avatar/change") { oscState.params = {}; return; }      // new avatar -> reset list
+      if (address.startsWith("/avatar/parameters/")) oscState.params[address.slice(19)] = args[0];
+    });
+    oscState.receiving = true;
+  } catch (e) { notify(e.message || String(e)); }
+}
+async function toggleParam(p) {
+  const next = typeof p.value === "boolean" ? !p.value : (p.value ? 0 : 1);
+  osc.setTarget(oscState.host, oscState.port);
+  try { await osc.setParam(p.name, next); oscState.params[p.name] = next; }
+  catch (e) { notify(e.message || String(e)); }
+}
+function editParam(p) { oscState.pName = p.name; oscState.pVal = String(p.value); }
 function applyTarget() { osc.setTarget(oscState.host, oscState.port); notify(`OSC target set to ${oscState.host}:${oscState.port}`); }
 async function sendChat() {
   if (!oscState.chat.trim()) return;
@@ -189,19 +209,7 @@ async function sendParam(forceType) {
   try { const n = await osc.setParam(oscState.pName.trim(), value); oscState.last = `✅ Sent ${n} bytes — ${oscState.pName}=${value}`; notify(`Sent ${oscState.pName} = ${value}`); }
   catch (e) { oscState.last = `❌ ${e.message || e}`; notify(e.message || String(e)); }
 }
-async function toggleReceiver() {
-  if (oscState.receiving) { await osc.stopReceiver(); oscState.receiving = false; }
-  else {
-    try {
-      await osc.startReceiver((name, val) => {
-        const i = oscState.incoming.findIndex((x) => x.name === name);
-        if (i >= 0) oscState.incoming[i].val = val; else oscState.incoming.unshift({ name, val });
-        oscState.incoming = oscState.incoming.slice(0, 40);
-      });
-      oscState.receiving = true; notify("Listening for avatar parameters");
-    } catch (e) { notify(e.message || String(e)); }
-  }
-}
+function clearParams() { oscState.params = {}; }
 
 // ---------- gallery ----------
 const gal = reactive({ busy: false, images: [], path: "Pictures/VRChat", msg: "" });
@@ -221,6 +229,7 @@ function openTab(name) {
   if (name === "groups" && !grp.list.length) loadGroups();
   if (name === "notifs" && !nt.list.length) loadNotifs();
   if (name === "worlds" && wld.mode === "fav" && !wld.list.length) loadWorldFavs();
+  if (name === "osc") startOsc();
 }
 
 onMounted(async () => {
@@ -402,19 +411,29 @@ onMounted(async () => {
             <button class="primary" @click="sendChat">Send to chatbox</button>
           </div>
           <div class="card-lg">
-            <h2>🎚️ Avatar parameter</h2>
+            <div class="row2" style="justify-content:space-between;align-items:center">
+              <h2 style="margin:0">🎚️ Avatar parameters ({{ paramList.length }})</h2>
+              <button class="mini" @click="clearParams">Clear</button>
+            </div>
+            <p class="muted small" v-if="!paramList.length">{{ oscState.receiving ? "Listening… built-in parameters appear instantly; custom toggles appear when they change in-game (or re-load your avatar to dump them all)." : "Open this tab with VRChat OSC enabled to auto-detect parameters." }}</p>
+            <div class="paramlist">
+              <div v-for="p in paramList" :key="p.name" class="prow">
+                <span>{{ p.name }}</span>
+                <span class="pright">
+                  <button v-if="typeof p.value === 'boolean'" class="mini" :class="{ ok: p.value }" @click="toggleParam(p)">{{ p.value ? "ON" : "OFF" }}</button>
+                  <b v-else>{{ fmtVal(p.value) }}</b>
+                  <button class="mini" title="Edit/send manually" @click="editParam(p)">✎</button>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="card-lg">
+            <h2>🎚️ Send a parameter manually</h2>
             <input v-model="oscState.pName" placeholder="Parameter name (e.g. Hue)" />
             <input v-model="oscState.pVal" placeholder="Value (1, 0.5, true/false)" />
             <div class="row2">
               <button class="primary" @click="sendParam()">Send</button>
               <button class="ghost" @click="sendParam('toggle')">Send TRUE</button>
-            </div>
-          </div>
-          <div class="card-lg">
-            <h2>📡 Incoming parameters</h2>
-            <button class="ghost" @click="toggleReceiver">{{ oscState.receiving ? "Stop listening" : "Start listening" }}</button>
-            <div class="paramlist" v-if="oscState.incoming.length">
-              <div v-for="p in oscState.incoming" :key="p.name" class="prow"><span>{{ p.name }}</span><b>{{ String(p.val) }}</b></div>
             </div>
           </div>
         </template>

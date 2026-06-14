@@ -105,18 +105,18 @@ export async function setParam(name, value) {
   return sendRaw(`/avatar/parameters/${name}`, [arg]);
 }
 
-// ---- receive (incoming avatar parameters) ----
+// ---- receive (all incoming OSC; caller decides what to do) ----
 let listening = false;
-export async function startReceiver(onParam) {
+let oscHandle = null;
+export function isReceiving() { return listening; }
+export async function startReceiver(onMessage) {
   if (!isNative() || listening) return;
   listening = true;
-  Osc.addListener("osc", (ev) => {
+  oscHandle = await Osc.addListener("osc", (ev) => {
     try {
       const bin = Uint8Array.from(atob(ev.data), (c) => c.charCodeAt(0));
       const msg = decode(bin);
-      if (msg && msg.address && msg.address.startsWith("/avatar/parameters/")) {
-        onParam(msg.address.replace("/avatar/parameters/", ""), msg.args[0]);
-      }
+      if (msg && msg.address) onMessage(msg.address, msg.args);
     } catch { /* ignore malformed */ }
   });
   await Osc.startListen({ port: 9001 });
@@ -124,5 +124,6 @@ export async function startReceiver(onParam) {
 export async function stopReceiver() {
   if (!isNative() || !listening) return;
   listening = false;
+  try { if (oscHandle) { oscHandle.remove(); oscHandle = null; } } catch { /* ignore */ }
   try { await Osc.stopListen(); } catch { /* ignore */ }
 }
