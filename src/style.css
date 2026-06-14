@@ -98,6 +98,9 @@ button.primary:active,button.ghost:active{transform:scale(.97)}
 .prow{display:flex;justify-content:space-between;gap:12px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 13px;font-size:14px}
 .prow b{color:var(--accent)}
 .pright{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.pslider{width:150px;max-width:42vw;accent-color:var(--accent);height:26px}
+.pval{color:var(--accent);min-width:48px;text-align:right;font-variant-numeric:tabular-nums}
+button.activeq{background:rgba(139,136,255,.16);border-color:var(--accent);color:var(--text)}
 .osc-status{margin:10px 0 0;font-size:13px;font-weight:600;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px 13px;word-break:break-word}
 
 /* ---- scripts / block editor ---- */

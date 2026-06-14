@@ -1,6 +1,6 @@
 {
-  "version": "0.1.4",
-  "versionCode": 5,
-  "apkUrl": "https://github.com/XnotCykoX/vrc-nexus-quest/releases/download/v0.1.4/VRC-NEXUS-Quest.apk",
-  "notes": "Bigger UI by default + A-/A+ size controls in the header (easier to use in-headset)"
+  "version": "0.1.5",
+  "versionCode": 6,
+  "apkUrl": "https://github.com/XnotCykoX/vrc-nexus-quest/releases/download/v0.1.5/VRC-NEXUS-Quest.apk",
+  "notes": "OSC helpers: live sliders to set numeric params (height/hue/scale), quick actions (mute/jump/typing), Input script block"
 }

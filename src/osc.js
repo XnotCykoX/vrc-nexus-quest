@@ -105,6 +105,16 @@ export async function setParam(name, value) {
   return sendRaw(`/avatar/parameters/${name}`, [arg]);
 }
 
+// ---- VRChat input helpers (the PC-app quick actions) ----
+export async function inputInt(name, value) { return sendRaw(`/input/${name}`, [{ type: "i", value: value | 0 }]); }
+export async function pulseInput(name, ms = 120) {
+  await inputInt(name, 1);
+  await new Promise((r) => setTimeout(r, ms));
+  return inputInt(name, 0);
+}
+export async function voicePulse() { return pulseInput("Voice"); }   // toggles mute
+export async function jump() { return pulseInput("Jump"); }
+
 // ---- receive (all incoming OSC; caller decides what to do) ----
 let listening = false;
 let oscHandle = null;

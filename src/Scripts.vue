@@ -22,6 +22,7 @@ function makeBlock(type) {
   else if (type === "chatbox") Object.assign(b, { text: "" });
   else if (type === "random") Object.assign(b, { param: "", min: 0, max: 1 });
   else if (type === "ramp") Object.assign(b, { param: "", from: 0, to: 1, seconds: 5 });
+  else if (type === "input") Object.assign(b, { input: "Jump", pulse: true, value: 1 });
   else if (type === "loop") Object.assign(b, { count: 0, children: [] });
   return b;
 }
@@ -29,7 +30,8 @@ function add(list, type) { list.push(makeBlock(type)); }
 function remove(list, i) { list.splice(i, 1); }
 function move(list, i, d) { const j = i + d; if (j < 0 || j >= list.length) return; const [x] = list.splice(i, 1); list.splice(j, 0, x); }
 
-const TYPES = [["set", "Set"], ["ramp", "Ramp"], ["random", "Random"], ["wait", "Wait"], ["chatbox", "Chatbox"], ["loop", "Loop"]];
+const TYPES = [["set", "Set"], ["ramp", "Ramp"], ["random", "Random"], ["input", "Input"], ["wait", "Wait"], ["chatbox", "Chatbox"], ["loop", "Loop"]];
+const INPUTS = ["Jump", "Voice", "Run", "MoveForward", "MoveBackward", "MoveLeft", "MoveRight", "ComfortLeft", "ComfortRight"];
 const LEAF_TYPES = TYPES.filter((t) => t[0] !== "loop");
 
 // ---- runtime ----
@@ -44,6 +46,7 @@ async function runBlocks(list) {
       else if (b.type === "wait") await sleep(Number(b.ms) || 0);
       else if (b.type === "chatbox") { if (b.text.trim()) await osc.chatbox(b.text.trim()); }
       else if (b.type === "random") { const v = Number(b.min) + Math.random() * (Number(b.max) - Number(b.min)); await osc.setParam(b.param.trim(), Number(v.toFixed(4))); }
+      else if (b.type === "input") { if (b.pulse) await osc.pulseInput(b.input.trim()); else await osc.inputInt(b.input.trim(), Number(b.value)); }
       else if (b.type === "ramp") await runRamp(b);
       else if (b.type === "loop") {
         let i = 0;
@@ -152,6 +155,12 @@ function loadRainbow() {
               <input v-model="b.min" class="bin xs" placeholder="min" />
               <input v-model="b.max" class="bin xs" placeholder="max" />
             </template>
+            <!-- INPUT -->
+            <template v-else-if="b.type === 'input'">
+              <select v-model="b.input" class="bin sm"><option v-for="n in INPUTS" :key="n" :value="n">{{ n }}</option></select>
+              <select v-model="b.pulse" class="bin sm"><option :value="true">Pulse</option><option :value="false">Hold</option></select>
+              <input v-if="!b.pulse" v-model="b.value" class="bin xs" placeholder="0/1" />
+            </template>
             <!-- WAIT -->
             <template v-else-if="b.type === 'wait'">
               <input v-model="b.ms" class="bin sm" placeholder="ms" /><span class="u">ms</span>
@@ -194,6 +203,11 @@ function loadRainbow() {
                   <input v-model="c.param" placeholder="Parameter" class="bin" />
                   <input v-model="c.min" class="bin xs" placeholder="min" />
                   <input v-model="c.max" class="bin xs" placeholder="max" />
+                </template>
+                <template v-else-if="c.type === 'input'">
+                  <select v-model="c.input" class="bin sm"><option v-for="n in INPUTS" :key="n" :value="n">{{ n }}</option></select>
+                  <select v-model="c.pulse" class="bin sm"><option :value="true">Pulse</option><option :value="false">Hold</option></select>
+                  <input v-if="!c.pulse" v-model="c.value" class="bin xs" placeholder="0/1" />
                 </template>
                 <template v-else-if="c.type === 'wait'">
                   <input v-model="c.ms" class="bin sm" placeholder="ms" /><span class="u">ms</span>

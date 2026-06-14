@@ -198,6 +198,23 @@ async function toggleParam(p) {
   catch (e) { notify(e.message || String(e)); }
 }
 function editParam(p) { oscState.pName = p.name; oscState.pVal = String(p.value); }
+// Live-set a numeric parameter from a slider (set_height, hue, scale, …).
+async function setParamLive(p, v) {
+  const num = Number(v);
+  oscState.params[p.name] = num;
+  osc.setTarget(oscState.host, oscState.port);
+  try { await osc.setParam(p.name, num); } catch (e) { oscState.last = `❌ ${e.message || e}`; }
+}
+// PC-style quick-action helpers.
+const typing = ref(false);
+async function oscQuick(kind) {
+  osc.setTarget(oscState.host, oscState.port);
+  try {
+    if (kind === "voice") { await osc.voicePulse(); notify("🎙️ Mute toggled"); }
+    else if (kind === "jump") { await osc.jump(); notify("⬆️ Jump"); }
+    else if (kind === "typing") { typing.value = !typing.value; await osc.chatboxTyping(typing.value); notify(typing.value ? "⌨️ Typing on" : "Typing off"); }
+  } catch (e) { notify(e.message || String(e)); }
+}
 function applyTarget() { osc.setTarget(oscState.host, oscState.port); notify(`OSC target set to ${oscState.host}:${oscState.port}`); }
 async function sendChat() {
   if (!oscState.chat.trim()) return;
@@ -423,6 +440,14 @@ onMounted(async () => {
             <p v-if="oscState.last" class="osc-status">{{ oscState.last }}</p>
           </div>
           <div class="card-lg">
+            <h2>⚡ Quick actions</h2>
+            <div class="row2">
+              <button class="ghost" @click="oscQuick('voice')">🎙️ Mute toggle</button>
+              <button class="ghost" @click="oscQuick('jump')">⬆️ Jump</button>
+              <button class="ghost" :class="{ activeq: typing }" @click="oscQuick('typing')">⌨️ Typing {{ typing ? "ON" : "" }}</button>
+            </div>
+          </div>
+          <div class="card-lg">
             <h2>💬 Chatbox</h2>
             <input v-model="oscState.chat" placeholder="Type a message…" maxlength="144" @keydown.enter="sendChat" />
             <button class="primary" @click="sendChat">Send to chatbox</button>
@@ -438,7 +463,10 @@ onMounted(async () => {
                 <span>{{ p.name }}</span>
                 <span class="pright">
                   <button v-if="typeof p.value === 'boolean'" class="mini" :class="{ ok: p.value }" @click="toggleParam(p)">{{ p.value ? "ON" : "OFF" }}</button>
-                  <b v-else>{{ fmtVal(p.value) }}</b>
+                  <template v-else>
+                    <input type="range" class="pslider" :min="Math.min(0, p.value)" :max="Math.max(1, p.value)" :step="Number.isInteger(p.value) ? 1 : 0.01" :value="p.value" @input="setParamLive(p, $event.target.value)" />
+                    <b class="pval">{{ fmtVal(p.value) }}</b>
+                  </template>
                   <button class="mini" title="Edit/send manually" @click="editParam(p)">✎</button>
                 </span>
               </div>
