@@ -116,6 +116,9 @@ button.activeq{background:rgba(139,136,255,.16);border-color:var(--accent);color
 .block.ramp{border-left-color:#ff6fae}
 .block.chatbox{border-left-color:var(--green)}
 .block.wait{border-left-color:#6a7088}
+.block.height{border-left-color:#5b9dff}.block.hue{border-left-color:#ff6fae}.block.emission{border-left-color:#ffce4d}.block.input{border-left-color:#3ddc84}
+.swtog{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer}
+.swtog input{width:18px;height:18px}
 .bhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .btag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);min-width:58px}
 .brow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1}

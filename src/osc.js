@@ -115,6 +115,28 @@ export async function pulseInput(name, ms = 120) {
 export async function voicePulse() { return pulseInput("Voice"); }   // toggles mute
 export async function jump() { return pulseInput("Jump"); }
 
+// ---- named helpers (ported from the PC scripting engine) ----
+// Registry of parameter names seen on the wire (filled by the receiver), used by set_hue/set_emission.
+const knownParams = new Set();
+export function noteParam(name) { if (name) knownParams.add(name); }
+export function clearKnownParams() { knownParams.clear(); }
+export function paramNames() { return [...knownParams]; }
+
+const _SKIP = ["vrc", "velocity", "viseme", "gesture", "grounded", "upright", "seated", "afk", "voice", "angular", "ineye", "islocal", "tracking", "scale", "height", "weight", "blend"];
+const _notBuiltin = (low) => !_SKIP.some((s) => low.startsWith(s));
+export function hueParams() {
+  return paramNames().filter((n) => { const low = n.toLowerCase(); return _notBuiltin(low) && (low.includes("hue") || low.includes("tint") || (n.length > 1 && n.endsWith("H"))); });
+}
+export function emissionParams() {
+  return paramNames().filter((n) => { const low = n.toLowerCase(); return _notBuiltin(low) && ["emiss", "emis", "emit", "glow", "bloom"].some((w) => low.includes(w)); });
+}
+
+// set_height(metres) — VRChat native avatar scaling.
+export async function setHeight(meters) { return sendRaw("/avatar/eyeheight", [{ type: "f", value: Number(meters) }]); }
+// set_hue / set_emission — set EVERY detected colour float at once.
+export async function setHue(value) { const ns = hueParams(); for (const n of ns) await setParam(n, Number(value)); return ns; }
+export async function setEmission(value) { const ns = emissionParams(); for (const n of ns) await setParam(n, Number(value)); return ns; }
+
 // ---- receive (all incoming OSC; caller decides what to do) ----
 let listening = false;
 let oscHandle = null;

@@ -1,6 +1,6 @@
 {
-  "version": "0.1.5",
-  "versionCode": 6,
+  "version": "0.1.6",
+  "versionCode": 7,
   "apkUrl": "https://raw.githubusercontent.com/XnotCykoX/vrc-nexus-quest/main/VRC-NEXUS-Quest.apk",
-  "notes": "OSC helpers: live sliders to set numeric params (height/hue/scale), quick actions (mute/jump/typing), Input script block"
+  "notes": "Named code blocks: Height (set_height), Hue (set_hue), Emission (set_emission) — set or sweep all detected colour params"
 }

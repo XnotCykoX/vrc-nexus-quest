@@ -185,8 +185,8 @@ async function startOsc() {
   if (oscState.receiving || !oscState.available) return;
   try {
     await osc.startReceiver((address, args) => {
-      if (address === "/avatar/change") { oscState.params = {}; return; }      // new avatar -> reset list
-      if (address.startsWith("/avatar/parameters/")) oscState.params[address.slice(19)] = args[0];
+      if (address === "/avatar/change") { oscState.params = {}; osc.clearKnownParams(); return; }   // new avatar -> reset
+      if (address.startsWith("/avatar/parameters/")) { const name = address.slice(19); osc.noteParam(name); oscState.params[name] = args[0]; }
     });
     oscState.receiving = true;
   } catch (e) { notify(e.message || String(e)); }
@@ -262,6 +262,7 @@ function openTab(name) {
 }
 
 onMounted(async () => {
+  if (osc.oscAvailable()) startOsc();     // collect avatar params in the background (for set_hue/set_emission)
   await vrc.loadSession();               // restore the durable login cookie (survives updates)
   if (vrc.isLoggedIn()) { try { store.user = await vrc.currentUser(); } catch { /* ignore */ } }
   try { const u = await checkForUpdate(); if (u.available) Object.assign(update, u); } catch { /* ignore */ }

@@ -23,6 +23,9 @@ function makeBlock(type) {
   else if (type === "random") Object.assign(b, { param: "", min: 0, max: 1 });
   else if (type === "ramp") Object.assign(b, { param: "", from: 0, to: 1, seconds: 5 });
   else if (type === "input") Object.assign(b, { input: "Jump", pulse: true, value: 1 });
+  else if (type === "height") Object.assign(b, { value: 1.7, sweep: false, from: 0.5, to: 2, seconds: 3 });
+  else if (type === "hue") Object.assign(b, { value: 0.5, sweep: false, from: 0, to: 1, seconds: 5 });
+  else if (type === "emission") Object.assign(b, { value: 1, sweep: false, from: 0, to: 1, seconds: 3 });
   else if (type === "loop") Object.assign(b, { count: 0, children: [] });
   return b;
 }
@@ -30,7 +33,8 @@ function add(list, type) { list.push(makeBlock(type)); }
 function remove(list, i) { list.splice(i, 1); }
 function move(list, i, d) { const j = i + d; if (j < 0 || j >= list.length) return; const [x] = list.splice(i, 1); list.splice(j, 0, x); }
 
-const TYPES = [["set", "Set"], ["ramp", "Ramp"], ["random", "Random"], ["input", "Input"], ["wait", "Wait"], ["chatbox", "Chatbox"], ["loop", "Loop"]];
+const TYPES = [["height", "Height"], ["hue", "Hue"], ["emission", "Emission"], ["set", "Set"], ["ramp", "Ramp"], ["random", "Random"], ["input", "Input"], ["wait", "Wait"], ["chatbox", "Chatbox"], ["loop", "Loop"]];
+const HELPER = ["height", "hue", "emission"];
 const INPUTS = ["Jump", "Voice", "Run", "MoveForward", "MoveBackward", "MoveLeft", "MoveRight", "ComfortLeft", "ComfortRight"];
 const LEAF_TYPES = TYPES.filter((t) => t[0] !== "loop");
 
@@ -47,6 +51,7 @@ async function runBlocks(list) {
       else if (b.type === "chatbox") { if (b.text.trim()) await osc.chatbox(b.text.trim()); }
       else if (b.type === "random") { const v = Number(b.min) + Math.random() * (Number(b.max) - Number(b.min)); await osc.setParam(b.param.trim(), Number(v.toFixed(4))); }
       else if (b.type === "input") { if (b.pulse) await osc.pulseInput(b.input.trim()); else await osc.inputInt(b.input.trim(), Number(b.value)); }
+      else if (HELPER.includes(b.type)) await runHelper(b);
       else if (b.type === "ramp") await runRamp(b);
       else if (b.type === "loop") {
         let i = 0;
@@ -58,6 +63,19 @@ async function runBlocks(list) {
         }
       }
     } catch (e) { status.value = "⚠️ " + (e.message || e); }
+  }
+}
+// Named helpers (set_height / set_hue / set_emission) — set once, or sweep over time.
+function helperCall(type) { return type === "height" ? osc.setHeight : type === "hue" ? osc.setHue : osc.setEmission; }
+async function runHelper(b) {
+  const call = helperCall(b.type);
+  if (!b.sweep) { await call(Number(b.value)); return; }
+  const from = Number(b.from), to = Number(b.to);
+  const steps = Math.max(1, Math.round((Number(b.seconds) || 1) * 20));
+  for (let i = 0; i <= steps; i++) {
+    if (!running.value) return;
+    await call(from + (to - from) * (i / steps));
+    await sleep(50);
   }
 }
 async function runRamp(b) {
@@ -96,11 +114,11 @@ function del(name) { delete saved[name]; persist(); }
 function loadRainbow() {
   program.splice(0, program.length);
   const loop = makeBlock("loop"); loop.count = 0;
-  const ramp = makeBlock("ramp"); ramp.param = "Hue"; ramp.from = 0; ramp.to = 1; ramp.seconds = 5;
-  loop.children.push(ramp);
+  const hue = makeBlock("hue"); hue.sweep = true; hue.from = 0; hue.to = 1; hue.seconds = 5;
+  loop.children.push(hue);
   program.push(loop);
   scriptName.value = "Rainbow";
-  status.value = "🌈 Rainbow loaded — set the param to your avatar's colour/Hue param, then Run.";
+  status.value = "🌈 Rainbow loaded — sweeps ALL detected hue params. Open the OSC tab once (with VRChat OSC on) so it can detect them, then Run.";
 }
 </script>
 
@@ -141,6 +159,13 @@ function loadRainbow() {
               <input v-model="b.param" placeholder="Parameter" class="bin" />
               <select v-model="b.kind" class="bin sm"><option value="num">Number</option><option value="on">On</option><option value="off">Off</option></select>
               <input v-if="b.kind === 'num'" v-model="b.value" class="bin sm" placeholder="value" />
+            </template>
+            <!-- HEIGHT / HUE / EMISSION (named helpers) -->
+            <template v-else-if="HELPER.includes(b.type)">
+              <span class="u">{{ b.type === 'height' ? 'metres' : '0–1, all ' + b.type + ' params' }}</span>
+              <template v-if="!b.sweep"><input v-model="b.value" class="bin xs" placeholder="value" /></template>
+              <template v-else><input v-model="b.from" class="bin xs" placeholder="from" /><input v-model="b.to" class="bin xs" placeholder="to" /><input v-model="b.seconds" class="bin xs" placeholder="sec" /><span class="u">s</span></template>
+              <label class="swtog"><input type="checkbox" v-model="b.sweep" /> sweep</label>
             </template>
             <!-- RAMP -->
             <template v-else-if="b.type === 'ramp'">
@@ -192,6 +217,12 @@ function loadRainbow() {
                   <input v-model="c.param" placeholder="Parameter" class="bin" />
                   <select v-model="c.kind" class="bin sm"><option value="num">Number</option><option value="on">On</option><option value="off">Off</option></select>
                   <input v-if="c.kind === 'num'" v-model="c.value" class="bin sm" placeholder="value" />
+                </template>
+                <template v-else-if="HELPER.includes(c.type)">
+                  <span class="u">{{ c.type === 'height' ? 'metres' : '0–1' }}</span>
+                  <template v-if="!c.sweep"><input v-model="c.value" class="bin xs" placeholder="value" /></template>
+                  <template v-else><input v-model="c.from" class="bin xs" placeholder="from" /><input v-model="c.to" class="bin xs" placeholder="to" /><input v-model="c.seconds" class="bin xs" placeholder="sec" /><span class="u">s</span></template>
+                  <label class="swtog"><input type="checkbox" v-model="c.sweep" /> sweep</label>
                 </template>
                 <template v-else-if="c.type === 'ramp'">
                   <input v-model="c.param" placeholder="Parameter" class="bin" />
