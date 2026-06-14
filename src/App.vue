@@ -5,6 +5,7 @@ import { discoverSearch } from "./discover.js";
 import * as osc from "./osc.js";
 import { listScreenshots } from "./gallery.js";
 import { checkForUpdate, installUpdate } from "./updater.js";
+import Scripts from "./Scripts.vue";
 import { store, rememberMeta, metaFor, isFav, toggleFav, allFavIds, createSection, deleteSection, pushRecent } from "./store.js";
 
 const update = reactive({ available: false, version: "", notes: "", apkUrl: "", busy: false });
@@ -25,6 +26,7 @@ const TABS = [
   ["groups", "🛡️", "Groups"],
   ["notifs", "🔔", "Notifs"],
   ["osc", "🎛️", "OSC"],
+  ["scripts", "🧩", "Scripts"],
   ["gallery", "📷", "Gallery"],
   ["account", "👤", "Account"],
 ];
@@ -437,6 +439,11 @@ onMounted(async () => {
             </div>
           </div>
         </template>
+      </section>
+
+      <!-- SCRIPTS -->
+      <section v-show="tab === 'scripts'">
+        <Scripts />
       </section>
 
       <!-- GALLERY -->

@@ -1,6 +1,6 @@
 {
-  "version": "0.1.2",
-  "versionCode": 3,
-  "apkUrl": "https://github.com/XnotCykoX/vrc-nexus-quest/releases/download/v0.1.2/VRC-NEXUS-Quest.apk",
-  "notes": "Avatar parameters now auto-detected live (no waiting); toggle/edit from the list"
+  "version": "0.1.3",
+  "versionCode": 4,
+  "apkUrl": "https://github.com/XnotCykoX/vrc-nexus-quest/releases/download/v0.1.3/VRC-NEXUS-Quest.apk",
+  "notes": "New Scripts tab: visual OSC block scripting (loops, ramps, rainbow effect)"
 }

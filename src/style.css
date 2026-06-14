@@ -94,6 +94,28 @@ button.primary:active,button.ghost:active{transform:scale(.97)}
 .pright{display:flex;align-items:center;gap:8px;flex:0 0 auto}
 .osc-status{margin:10px 0 0;font-size:13px;font-weight:600;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px 13px;word-break:break-word}
 
+/* ---- scripts / block editor ---- */
+.btn-stop{background:linear-gradient(180deg,var(--red),#d8323b);color:#fff;border:0;border-radius:12px;padding:11px 22px;font-size:16px;font-weight:700;cursor:pointer;min-height:50px}
+.palette{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.palette.inner{margin-top:10px}
+.pbtn{background:var(--panel2);border:1px dashed var(--line);color:var(--accent);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:700;cursor:pointer;min-height:42px}
+.pbtn.sm{padding:8px 11px;font-size:13px;min-height:38px}
+.pbtn:active{background:rgba(139,136,255,.16)}
+.prog{display:flex;flex-direction:column;gap:10px}
+.block{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:10px 12px}
+.block.loop{border-left-color:var(--gold)}
+.block.ramp{border-left-color:#ff6fae}
+.block.chatbox{border-left-color:var(--green)}
+.block.wait{border-left-color:#6a7088}
+.bhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);min-width:58px}
+.brow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1}
+.bin{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:9px 11px;font-size:14px;min-width:80px;flex:1;min-height:40px}
+.bin.sm{flex:0 0 auto;max-width:120px}.bin.xs{flex:0 0 auto;width:68px;min-width:0}
+.u{font-size:13px;color:var(--muted)}
+.bctl{display:flex;gap:5px;flex:0 0 auto}
+.children{margin:10px 0 0 14px;padding:10px 0 4px 12px;border-left:2px dashed var(--line)}
+
 /* ---- gallery ---- */
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
 .shot{display:block;aspect-ratio:16/9;background:#0c0e17 center/cover no-repeat;border:1px solid var(--line);border-radius:12px}

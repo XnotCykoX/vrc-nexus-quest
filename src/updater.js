@@ -9,7 +9,7 @@ import { registerPlugin } from "@capacitor/core";
 const Updater = registerPlugin("Updater");
 
 // This build's identity — bump on every release.
-export const BUILD = { version: "0.1.2", code: 3 };
+export const BUILD = { version: "0.1.3", code: 4 };
 
 // Hosted manifest (GitHub raw). The app polls this on launch to offer updates.
 export const UPDATE_MANIFEST_URL = "https://raw.githubusercontent.com/XnotCykoX/vrc-nexus-quest/main/update.json";
