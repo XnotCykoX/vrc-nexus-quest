@@ -4,3 +4,7 @@ android/
 .DS_Store
 *.log
 .vite/
+# signing secrets — NEVER commit these (and back them up safely!)
+*.jks
+*.keystore
+keystore.properties

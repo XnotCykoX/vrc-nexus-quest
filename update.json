@@ -1,6 +1,6 @@
 {
-  "version": "0.1.7",
-  "versionCode": 8,
+  "version": "0.1.8",
+  "versionCode": 9,
   "apkUrl": "https://raw.githubusercontent.com/XnotCykoX/vrc-nexus-quest/main/VRC-NEXUS-Quest.apk",
-  "notes": "Ping-pong (bounce) sweep — values go up then back down and repeat (e.g. rainbow 0->1->0 forever)"
+  "notes": "New app icon + release-signed builds (App Lab ready). One-time: uninstall the old build, then install this one."
 }
