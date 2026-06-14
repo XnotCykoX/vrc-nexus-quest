@@ -21,11 +21,11 @@ function makeBlock(type) {
   else if (type === "wait") Object.assign(b, { ms: 500 });
   else if (type === "chatbox") Object.assign(b, { text: "" });
   else if (type === "random") Object.assign(b, { param: "", min: 0, max: 1 });
-  else if (type === "ramp") Object.assign(b, { param: "", from: 0, to: 1, seconds: 5 });
+  else if (type === "ramp") Object.assign(b, { param: "", from: 0, to: 1, seconds: 5, pingpong: false });
   else if (type === "input") Object.assign(b, { input: "Jump", pulse: true, value: 1 });
-  else if (type === "height") Object.assign(b, { value: 1.7, sweep: false, from: 0.5, to: 2, seconds: 3 });
-  else if (type === "hue") Object.assign(b, { value: 0.5, sweep: false, from: 0, to: 1, seconds: 5 });
-  else if (type === "emission") Object.assign(b, { value: 1, sweep: false, from: 0, to: 1, seconds: 3 });
+  else if (type === "height") Object.assign(b, { value: 1.7, sweep: false, from: 0.5, to: 2, seconds: 3, pingpong: false });
+  else if (type === "hue") Object.assign(b, { value: 0.5, sweep: false, from: 0, to: 1, seconds: 5, pingpong: true });
+  else if (type === "emission") Object.assign(b, { value: 1, sweep: false, from: 0, to: 1, seconds: 3, pingpong: false });
   else if (type === "loop") Object.assign(b, { count: 0, children: [] });
   return b;
 }
@@ -65,28 +65,27 @@ async function runBlocks(list) {
     } catch (e) { status.value = "⚠️ " + (e.message || e); }
   }
 }
-// Named helpers (set_height / set_hue / set_emission) — set once, or sweep over time.
+// Smoothly drive apply(value) from->to over `seconds` (~20 updates/sec).
+async function sweepVals(apply, from, to, seconds) {
+  const steps = Math.max(1, Math.round((Number(seconds) || 1) * 20));
+  for (let i = 0; i <= steps; i++) {
+    if (!running.value) return;
+    await apply(from + (to - from) * (i / steps));
+    await sleep(50);
+  }
+}
+// Named helpers (set_height / set_hue / set_emission) — set once, or sweep (optionally bouncing back).
 function helperCall(type) { return type === "height" ? osc.setHeight : type === "hue" ? osc.setHue : osc.setEmission; }
 async function runHelper(b) {
   const call = helperCall(b.type);
   if (!b.sweep) { await call(Number(b.value)); return; }
-  const from = Number(b.from), to = Number(b.to);
-  const steps = Math.max(1, Math.round((Number(b.seconds) || 1) * 20));
-  for (let i = 0; i <= steps; i++) {
-    if (!running.value) return;
-    await call(from + (to - from) * (i / steps));
-    await sleep(50);
-  }
+  await sweepVals(call, Number(b.from), Number(b.to), b.seconds);
+  if (b.pingpong) await sweepVals(call, Number(b.to), Number(b.from), b.seconds);   // …then back down
 }
 async function runRamp(b) {
-  const from = Number(b.from), to = Number(b.to);
-  const steps = Math.max(1, Math.round((Number(b.seconds) || 1) * 20)); // ~20 updates/sec
-  for (let i = 0; i <= steps; i++) {
-    if (!running.value) return;
-    const v = from + (to - from) * (i / steps);
-    await osc.setParam(b.param.trim(), Number(v.toFixed(4)));
-    await sleep(50);
-  }
+  const apply = (v) => osc.setParam(b.param.trim(), Number(Number(v).toFixed(4)));
+  await sweepVals(apply, Number(b.from), Number(b.to), b.seconds);
+  if (b.pingpong) await sweepVals(apply, Number(b.to), Number(b.from), b.seconds);
 }
 async function run() {
   if (running.value) return;
@@ -118,7 +117,7 @@ function loadRainbow() {
   loop.children.push(hue);
   program.push(loop);
   scriptName.value = "Rainbow";
-  status.value = "🌈 Rainbow loaded — sweeps ALL detected hue params. Open the OSC tab once (with VRChat OSC on) so it can detect them, then Run.";
+  status.value = "🌈 Rainbow loaded — bounces ALL hue params 0→1→0, forever. Open the OSC tab once (VRChat OSC on) so it detects them, then Run.";
 }
 </script>
 
@@ -166,6 +165,7 @@ function loadRainbow() {
               <template v-if="!b.sweep"><input v-model="b.value" class="bin xs" placeholder="value" /></template>
               <template v-else><input v-model="b.from" class="bin xs" placeholder="from" /><input v-model="b.to" class="bin xs" placeholder="to" /><input v-model="b.seconds" class="bin xs" placeholder="sec" /><span class="u">s</span></template>
               <label class="swtog"><input type="checkbox" v-model="b.sweep" /> sweep</label>
+              <label v-if="b.sweep" class="swtog"><input type="checkbox" v-model="b.pingpong" /> ↔ bounce</label>
             </template>
             <!-- RAMP -->
             <template v-else-if="b.type === 'ramp'">
@@ -173,6 +173,7 @@ function loadRainbow() {
               <input v-model="b.from" class="bin xs" placeholder="from" />
               <input v-model="b.to" class="bin xs" placeholder="to" />
               <input v-model="b.seconds" class="bin xs" placeholder="sec" /><span class="u">s</span>
+              <label class="swtog"><input type="checkbox" v-model="b.pingpong" /> ↔ bounce</label>
             </template>
             <!-- RANDOM -->
             <template v-else-if="b.type === 'random'">
@@ -223,12 +224,14 @@ function loadRainbow() {
                   <template v-if="!c.sweep"><input v-model="c.value" class="bin xs" placeholder="value" /></template>
                   <template v-else><input v-model="c.from" class="bin xs" placeholder="from" /><input v-model="c.to" class="bin xs" placeholder="to" /><input v-model="c.seconds" class="bin xs" placeholder="sec" /><span class="u">s</span></template>
                   <label class="swtog"><input type="checkbox" v-model="c.sweep" /> sweep</label>
+                  <label v-if="c.sweep" class="swtog"><input type="checkbox" v-model="c.pingpong" /> ↔ bounce</label>
                 </template>
                 <template v-else-if="c.type === 'ramp'">
                   <input v-model="c.param" placeholder="Parameter" class="bin" />
                   <input v-model="c.from" class="bin xs" placeholder="from" />
                   <input v-model="c.to" class="bin xs" placeholder="to" />
                   <input v-model="c.seconds" class="bin xs" placeholder="sec" /><span class="u">s</span>
+                  <label class="swtog"><input type="checkbox" v-model="c.pingpong" /> ↔ bounce</label>
                 </template>
                 <template v-else-if="c.type === 'random'">
                   <input v-model="c.param" placeholder="Parameter" class="bin" />

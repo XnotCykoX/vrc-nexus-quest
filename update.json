@@ -1,6 +1,6 @@
 {
-  "version": "0.1.6",
-  "versionCode": 7,
+  "version": "0.1.7",
+  "versionCode": 8,
   "apkUrl": "https://raw.githubusercontent.com/XnotCykoX/vrc-nexus-quest/main/VRC-NEXUS-Quest.apk",
-  "notes": "Named code blocks: Height (set_height), Hue (set_hue), Emission (set_emission) — set or sweep all detected colour params"
+  "notes": "Ping-pong (bounce) sweep — values go up then back down and repeat (e.g. rainbow 0->1->0 forever)"
 }
