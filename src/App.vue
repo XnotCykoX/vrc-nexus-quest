@@ -179,6 +179,8 @@ async function hideNotif(n) { if (await vrc.hideNotification(n.id)) { nt.list = 
 const _t = osc.getTarget();
 const oscState = reactive({ available: osc.oscAvailable(), chat: "", pName: "", pVal: "", receiving: false, params: {}, host: _t.host, port: _t.port, last: "" });
 const paramList = computed(() => Object.entries(oscState.params).map(([name, value]) => ({ name, value })).sort((a, b) => a.name.localeCompare(b.name)));
+const detectedHue = computed(() => { void Object.keys(oscState.params).length; return osc.hueParams(); });
+const detectedEmission = computed(() => { void Object.keys(oscState.params).length; return osc.emissionParams(); });
 function fmtVal(v) { return typeof v === "number" ? (Number.isInteger(v) ? v : v.toFixed(3)) : String(v); }
 // Auto-collect every avatar parameter VRChat streams (built-ins arrive instantly; all of them on avatar load).
 async function startOsc() {
@@ -468,6 +470,7 @@ onMounted(async () => {
               <button class="mini" @click="clearParams">Clear</button>
             </div>
             <p class="muted small" v-if="!paramList.length">{{ oscState.receiving ? "Listening… built-in parameters appear instantly; custom toggles appear when they change in-game (or re-load your avatar to dump them all)." : "Open this tab with VRChat OSC enabled to auto-detect parameters." }}</p>
+            <p class="muted small">🎨 Auto-detected → hue: <b>{{ detectedHue.length ? detectedHue.join(", ") : "none" }}</b> · emission: <b>{{ detectedEmission.length ? detectedEmission.join(", ") : "none" }}</b>. If a colour param is missing, re-load your avatar in VRChat (so it sends them), or type the exact name into the Hue/Emission script block.</p>
             <div class="paramlist">
               <div v-for="p in paramList" :key="p.name" class="prow">
                 <span>{{ p.name }}</span>

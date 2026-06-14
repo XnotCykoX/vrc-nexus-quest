@@ -134,8 +134,9 @@ export function emissionParams() {
 // set_height(metres) — VRChat native avatar scaling.
 export async function setHeight(meters) { return sendRaw("/avatar/eyeheight", [{ type: "f", value: Number(meters) }]); }
 // set_hue / set_emission — set EVERY detected colour float at once.
-export async function setHue(value) { const ns = hueParams(); for (const n of ns) await setParam(n, Number(value)); return ns; }
-export async function setEmission(value) { const ns = emissionParams(); for (const n of ns) await setParam(n, Number(value)); return ns; }
+// Pass an explicit `names` array to target exact params (when auto-detection misses them).
+export async function setHue(value, names) { const ns = (names && names.length) ? names : hueParams(); for (const n of ns) await setParam(n, Number(value)); return ns; }
+export async function setEmission(value, names) { const ns = (names && names.length) ? names : emissionParams(); for (const n of ns) await setParam(n, Number(value)); return ns; }
 
 // ---- receive (all incoming OSC; caller decides what to do) ----
 let listening = false;

@@ -24,8 +24,8 @@ function makeBlock(type) {
   else if (type === "ramp") Object.assign(b, { param: "", from: 0, to: 1, seconds: 5, pingpong: false });
   else if (type === "input") Object.assign(b, { input: "Jump", pulse: true, value: 1 });
   else if (type === "height") Object.assign(b, { value: 1.7, sweep: false, from: 0.5, to: 2, seconds: 3, pingpong: false });
-  else if (type === "hue") Object.assign(b, { value: 0.5, sweep: false, from: 0, to: 1, seconds: 5, pingpong: true });
-  else if (type === "emission") Object.assign(b, { value: 1, sweep: false, from: 0, to: 1, seconds: 3, pingpong: false });
+  else if (type === "hue") Object.assign(b, { value: 0.5, sweep: false, from: 0, to: 1, seconds: 5, pingpong: true, names: "" });
+  else if (type === "emission") Object.assign(b, { value: 1, sweep: false, from: 0, to: 1, seconds: 3, pingpong: false, names: "" });
   else if (type === "loop") Object.assign(b, { count: 0, children: [] });
   return b;
 }
@@ -75,9 +75,11 @@ async function sweepVals(apply, from, to, seconds) {
   }
 }
 // Named helpers (set_height / set_hue / set_emission) — set once, or sweep (optionally bouncing back).
-function helperCall(type) { return type === "height" ? osc.setHeight : type === "hue" ? osc.setHue : osc.setEmission; }
 async function runHelper(b) {
-  const call = helperCall(b.type);
+  const names = b.names ? b.names.split(/[,\s]+/).map((s) => s.trim()).filter(Boolean) : null;
+  const call = b.type === "height" ? (v) => osc.setHeight(v)
+    : b.type === "hue" ? (v) => osc.setHue(v, names)
+    : (v) => osc.setEmission(v, names);
   if (!b.sweep) { await call(Number(b.value)); return; }
   await sweepVals(call, Number(b.from), Number(b.to), b.seconds);
   if (b.pingpong) await sweepVals(call, Number(b.to), Number(b.from), b.seconds);   // …then back down
@@ -162,11 +164,12 @@ function loadRainbow() {
             </template>
             <!-- HEIGHT / HUE / EMISSION (named helpers) -->
             <template v-else-if="HELPER.includes(b.type)">
-              <span class="u">{{ b.type === 'height' ? 'metres' : '0–1, all ' + b.type + ' params' }}</span>
+              <span class="u">{{ b.type === 'height' ? 'metres' : '0–1' }}</span>
               <template v-if="!b.sweep"><input v-model="b.value" class="bin xs" placeholder="value" /></template>
               <template v-else><input v-model="b.from" class="bin xs" placeholder="from" /><input v-model="b.to" class="bin xs" placeholder="to" /><input v-model="b.seconds" class="bin xs" placeholder="sec" /><span class="u">s</span></template>
               <label class="swtog"><input type="checkbox" v-model="b.sweep" /> sweep</label>
               <label v-if="b.sweep" class="swtog"><input type="checkbox" v-model="b.pingpong" /> ↔ bounce</label>
+              <input v-if="b.type !== 'height'" v-model="b.names" class="bin" style="flex:1;min-width:120px" placeholder="param names — blank = auto-detect (e.g. Hue, EyeH)" />
             </template>
             <!-- RAMP -->
             <template v-else-if="b.type === 'ramp'">
@@ -226,6 +229,7 @@ function loadRainbow() {
                   <template v-else><input v-model="c.from" class="bin xs" placeholder="from" /><input v-model="c.to" class="bin xs" placeholder="to" /><input v-model="c.seconds" class="bin xs" placeholder="sec" /><span class="u">s</span></template>
                   <label class="swtog"><input type="checkbox" v-model="c.sweep" /> sweep</label>
                   <label v-if="c.sweep" class="swtog"><input type="checkbox" v-model="c.pingpong" /> ↔ bounce</label>
+                  <input v-if="c.type !== 'height'" v-model="c.names" class="bin" style="flex:1;min-width:120px" placeholder="param names — blank = auto-detect" />
                 </template>
                 <template v-else-if="c.type === 'ramp'">
                   <input v-model="c.param" placeholder="Parameter" class="bin" />
