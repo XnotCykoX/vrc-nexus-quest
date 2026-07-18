@@ -54,7 +54,7 @@ For the purposes of Meta Horizon's data handling declarations, the entity respon
 
 **Deizel Kite**, located in **Australia**.
 
-We do not use any third-party data processors or service providers with access to Meta Horizon User Data or Device User Data beyond what's described in this policy (Meta's own IAP/Subscriptions billing, and — only if you choose to publish to it — the Community Hub). All other processing occurs locally on your device; the remaining third parties contacted are VRChat, the avatar databases you choose to browse, and GitHub for update checks, each under their own respective privacy policies.
+The only data processor with access to the Meta User ID/entitlement data described above is **Cloudflare, Inc.** (United States), which hosts the backend infrastructure used to look up and remember a subscriber's unlocked Membership tier. Cloudflare acts purely as infrastructure — it does not use this data for its own analytics, advertising, or any purpose beyond running that lookup on our behalf. We do not use any other third-party data processors or service providers with access to Meta Horizon User Data or Device User Data. All other processing occurs locally on your device; the remaining third parties contacted are VRChat, the avatar databases you choose to browse, and GitHub for update checks, each under their own respective privacy policies.
 
 ## How to delete your data
 
