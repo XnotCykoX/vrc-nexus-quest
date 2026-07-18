@@ -15,7 +15,7 @@ All of the above lives in the app's local storage on your headset and is removed
 
 ## Data we (the developer) receive
 
-The only data that reaches a server we control is what you **explicitly choose to publish** to the in-app **Community Hub** (Chatbox tab → Community): the preset/script content itself, a display name you type in, and your random install ID (used to show "your items" and to let you delete them later — see below). This is stored in a private GitHub repository and Cloudflare storage that we administer. Nothing else you do in the app — browsing avatars, chatbox use, friends/worlds/groups, translator, media detection, etc. — is sent to us; those features talk directly from your device to the third-party services below.
+The only data that reaches a server we control is: (a) what you **explicitly choose to publish** to the in-app **Community Hub** (Chatbox tab → Community) — the preset/script content itself, a display name you type in, and your random install ID, used to show "your items" and let you delete them later; and (b) if you buy the optional donation or a Membership subscription, your **Meta User ID** and entitlement status, provided to us by Meta's own platform (see below). Nothing else you do in the app — browsing avatars, chatbox use, friends/worlds/groups, translator, media detection, etc. — is sent to us; those features talk directly from your device to the third-party services below.
 
 ## Services the app contacts directly (from your device, using your own VRChat login where applicable)
 
@@ -37,16 +37,31 @@ The only data that reaches a server we control is what you **explicitly choose t
 - **Install unknown apps** — only so the in-app updater can install a newer version you choose to download, from the GitHub release you approve.
 - **All-files access (`MANAGE_EXTERNAL_STORAGE`)** — used only by an advanced, Developer-Mode-only cache-reading feature aimed at power users. Not exposed in the main app UI.
 
-## Meta Platform purchases & subscriptions
+## Donations (optional in-app purchase)
 
-Premium features are unlocked through **Meta's own In-App Purchases and Subscriptions system**, not a payment system we run ourselves. When you buy or subscribe, Meta's platform tells the app your **Meta User ID** and your current entitlement/subscription status, so the app can unlock the features you paid for. We never see your payment method, billing address, or Meta password — all payment processing is handled entirely by Meta and governed by [Meta's own privacy policy](https://www.meta.com/legal/quest/privacy-policy/). We store only the minimum needed to remember your entitlement (your Meta User ID paired with your unlocked tier); we do not request or use your broader Meta profile (display name, friends list, avatar, etc.).
+The app offers an optional donation add-on through the Meta Horizon Store. This purchase:
+- Provides **no in-app goods, currency, unlocks, or functional benefit** — it exists purely as a way for users to voluntarily support development.
+- Is processed entirely by **Meta's own In-App Purchase (IAP) system**. We do not build, operate, or have access to any payment processing of our own.
+- Involves **no personal or financial data passing through the app or to us**. Meta handles billing, payment details, and transaction records directly; we do not receive your payment method, billing address, or any other checkout information.
+
+## Membership subscriptions (separate from Donations)
+
+Some features are also unlockable through an optional **Membership subscription**, purchased and managed through **Meta's own Subscriptions/IAP system**, not a payment system we run ourselves. Unlike the no-strings Donation above, unlocking a Membership tier requires the app to know what you're entitled to: when you subscribe, Meta's platform provides the app your **Meta User ID** and current subscription status, which we use only to remember your unlocked tier. We never see your payment method, billing address, or Meta password — all payment processing is handled entirely by Meta and governed by [Meta's own privacy policy](https://www.meta.com/legal/quest/privacy-policy/). We do not request or use your broader Meta profile (display name, friends list, avatar, etc.) — only the bare ID needed to check entitlement.
+
+## Data controller / responsible entity
+
+For the purposes of Meta Horizon's data handling declarations, the entity responsible for any Meta Horizon User Data and/or Device User Data made accessible through this app is:
+
+**VRC NEXUS**, located in **Australia**.
+
+We do not use any third-party data processors or service providers with access to Meta Horizon User Data or Device User Data beyond what's described in this policy (Meta's own IAP/Subscriptions billing, and — only if you choose to publish to it — the Community Hub). All other processing occurs locally on your device; the remaining third parties contacted are VRChat, the avatar databases you choose to browse, and GitHub for update checks, each under their own respective privacy policies.
 
 ## How to delete your data
 
 - **Everything stored on your device** (favourites, settings, cached session, scripts): uninstall the app, or use the in-app Sign Out.
 - **Your VRChat account data**: managed by VRChat directly at [vrchat.com](https://vrchat.com) — this app only ever acts on your behalf using your own login.
 - **Anything you published to the Community Hub**: open Chatbox → Community — your own items show a **Delete mine** button that removes them immediately and permanently. If you can't access the app, email **deizeljkite@gmail.com** with the item name and, if possible, your install ID (shown at the bottom of the Community tab) and we will delete it manually within a few days.
-- **Purchase/subscription entitlement data**: cancel or manage the subscription itself through your Meta account's subscription settings; to have the entitlement record tied to your Meta User ID deleted from our side, email **deizeljkite@gmail.com**.
+- **Membership/purchase entitlement data**: cancel or manage the subscription itself through your Meta account's subscription settings; to have the entitlement record tied to your Meta User ID deleted from our side, email **deizeljkite@gmail.com**.
 
 ## Children
 
