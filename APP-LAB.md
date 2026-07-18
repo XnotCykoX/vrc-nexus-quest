@@ -63,9 +63,17 @@ Meta's required art (verify exact sizes in the uploader — Meta tweaks them):
   (A proper HTML page on GitHub Pages looks more legitimate to reviewers — see step 8.)
 
 ## 6. Data Use Checkup (DUC) — recommended answers
-The app has **no backend** and collects **nothing** to any server you control. Answer truthfully; the typical answers here:
-- **Do you collect/use data?** The app does **not** transmit user data to the developer. It communicates **directly with VRChat under the user's own account** and reads only local data. Declare **no developer data collection / no sharing / no analytics / no ads**.
-- If Meta requires per-type answers, the only sensitive item is the **VRChat login**, which is entered by the user, sent only to VRChat, and stored **on-device** (session cookie only, never the password). Nothing is sold or shared.
+
+⚠️ **Outdated as of v0.4.0 — do not answer "no data collection" anymore.** The app has grown a Community Hub (publishing/browsing shared presets & scripts through a developer-run Cloudflare Worker), a notification-listener/media-session reader (Now Playing / lyrics), a translator (sends typed text to Google Translate), and VRChat Prints/VRC+ file uploads. `PRIVACY.md` is the source of truth — read it before filling out the DUC form, and keep both in sync whenever a feature that talks to a new service ships.
+
+- **Do you collect/use data?** Yes: (a) if the user opts into the **Community Hub**, the published content + a random non-personal install ID reaches a server we (the developer) operate; (b) **Subscriptions/IAP** (planned) use Meta's own platform purchase system, which hands the app the user's **Meta User ID** + entitlement status to unlock paid features. Nothing else does — every other feature talks directly from the user's device to VRChat or the relevant third-party API under the user's own request.
+- **Sensitive permissions to expect follow-up questions on:** Notification access (reads local media metadata only, never transmitted), battery state (local only), all-files access (Developer-Mode-only cache reading, not exposed in the main UI).
+- **Platform Feature checkboxes** (dashboard → Data Use Checkup / Platform Solutions), as of the Subscriptions/IAP work:
+  - ✅ `USER_ID` — required to check Meta-platform purchase/subscription entitlements.
+  - ✅ `SUBSCRIPTIONS`, ✅ `IAP` — genuinely used once the Membership feature ships.
+  - ❌ `DEVICE_BAN` — not used anywhere, keep unchecked.
+  - ❌ `USER_PROFILE` — broader than `USER_ID` (display name/friends/avatar); only needed if the app reads/shows Meta profile data beyond the bare ID, which it doesn't. Keep unchecked unless that changes.
+  - Keep this list and `PRIVACY.md`'s "Meta Platform purchases & subscriptions" section in sync with whatever's actually implemented.
 
 ## 7. Content rating (IARC)
 Fill the IARC questionnaire honestly. The app itself has no mature content; it's a utility. (VRChat itself is 13+.) You'll likely land at **Everyone/Teen**.
