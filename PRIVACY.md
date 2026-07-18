@@ -52,7 +52,7 @@ Some features are also unlockable through an optional **Membership subscription*
 
 For the purposes of Meta Horizon's data handling declarations, the entity responsible for any Meta Horizon User Data and/or Device User Data made accessible through this app is:
 
-**VRC NEXUS**, located in **Australia**.
+**Deizel Kite**, located in **Australia**.
 
 We do not use any third-party data processors or service providers with access to Meta Horizon User Data or Device User Data beyond what's described in this policy (Meta's own IAP/Subscriptions billing, and — only if you choose to publish to it — the Community Hub). All other processing occurs locally on your device; the remaining third parties contacted are VRChat, the avatar databases you choose to browse, and GitHub for update checks, each under their own respective privacy policies.
 
